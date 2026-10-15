@@ -323,75 +323,142 @@
   </footer>
 
  <script>
-    // Fetch live patch notes from GitHub repository
-    async function loadPatches() {
-      const container = document.getElementById('patch-list');
-      const countLabel = document.getElementById('patch-count');
+  // Passcode Unlock Logic
+  function unlockRepo() {
+    const code = document.getElementById('passcode-input').value;
+    if (code === '41658') {
+      localStorage.setItem('41658h_admin_unlocked', 'true');
+      document.getElementById('patch-editor').style.display = 'block';
+      document.getElementById('auth-box').style.display = 'none';
+      document.getElementById('auth-error').style.display = 'none';
+      renderPatches();
+    } else {
+      document.getElementById('auth-error').style.display = 'block';
+    }
+  }
 
-      try {
-        // Fetch patches.json from the repository
-        const response = await fetch('patches.json');
-        if (!response.ok) throw new Error('Could not load patches.json');
-        const patches = await response.json();
+  function lockRepo() {
+    localStorage.removeItem('41658h_admin_unlocked');
+    document.getElementById('patch-editor').style.display = 'none';
+    document.getElementById('auth-box').style.display = 'block';
+    document.getElementById('passcode-input').value = '';
+    renderPatches();
+  }
 
-        countLabel.textContent = `${patches.length} Patches Logged`;
+  // Fetch patches.json AND load localStorage
+  async function getAllPatches() {
+    let officialPatches = [];
 
-        if (patches.length === 0) {
-          container.innerHTML = `<p style="color: var(--text-muted); font-family: 'Fira Code';">No patch notes posted yet.</p>`;
-          return;
-        }
-
-        container.innerHTML = patches.map(p => `
-          <div class="patch-item">
-            <h4>${p.title}</h4>
-            <div class="patch-meta">Posted by <strong>${p.author}</strong> on ${p.date}</div>
-            <ul style="margin-left: 1.2rem; color: var(--text-main); font-size: 0.95rem;">
-              ${p.details.map(d => `<li>${d}</li>`).join('')}
-            </ul>
-          </div>
-        `).join('');
-
-      } catch (error) {
-        container.innerHTML = `<p style="color: #ff6666; font-family: 'Fira Code';">[!] Unable to load patches.json file from repository.</p>`;
+    // 1. Fetch official repo patches
+    try {
+      const response = await fetch('patches.json');
+      if (response.ok) {
+        officialPatches = await response.json();
       }
+    } catch (err) {
+      console.warn('patches.json not found or could not be loaded.');
     }
 
-    // Unlock Admin Portal
-    function unlockRepo() {
-      const code = document.getElementById('passcode-input').value;
-      const error = document.getElementById('auth-error');
+    // 2. Fetch locally saved patches
+    const savedLocal = localStorage.getItem('41658h_local_patches');
+    const localPatches = savedLocal ? JSON.parse(savedLocal) : [];
 
-      if (code === '41658') {
-        localStorage.setItem('41658h_admin_unlocked', 'true');
-        document.getElementById('patch-editor').style.display = 'block';
-        document.getElementById('auth-box').style.display = 'none';
-        error.style.display = 'none';
-      } else {
-        error.style.display = 'block';
-      }
+    // Tag local patches so they can be deleted individually
+    const taggedLocal = localPatches.map(p => ({ ...p, isLocal: true }));
+
+    // Combine local entries first, followed by official entries
+    return [...taggedLocal, ...officialPatches];
+  }
+
+  // Render merged patch notes
+  async function renderPatches() {
+    const container = document.getElementById('patch-list');
+    const countLabel = document.getElementById('patch-count');
+    const isUnlocked = localStorage.getItem('41658h_admin_unlocked') === 'true';
+
+    const patches = await getAllPatches();
+    countLabel.textContent = `${patches.length} Patches Loaded`;
+
+    if (patches.length === 0) {
+      container.innerHTML = `<p style="color: var(--text-muted); font-family: 'Fira Code';">No patch notes posted yet.</p>`;
+      return;
     }
 
-    // Lock Portal
-    function lockRepo() {
-      localStorage.removeItem('41658h_admin_unlocked');
-      document.getElementById('patch-editor').style.display = 'none';
-      document.getElementById('auth-box').style.display = 'block';
-      document.getElementById('passcode-input').value = '';
+    container.innerHTML = patches.map(p => `
+      <div class="patch-item">
+        ${(isUnlocked && p.isLocal) ? `<button class="delete-btn" onclick="deleteLocalPatch('${p.id}')">Delete Local</button>` : ''}
+        <h4 style="color: var(--green-primary); font-family: 'Fira Code';">
+          ${p.title} ${p.isLocal ? `<span style="font-size:0.7rem; color:var(--text-muted); border:1px solid var(--green-border); padding:2px 6px; border-radius:4px; margin-left:8px;">LOCAL</span>` : ''}
+        </h4>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+          Posted by <strong>${p.author}</strong> on ${p.date}
+        </div>
+        <ul style="margin-left: 1.2rem; color: var(--text-main); font-size: 0.95rem;">
+          ${(p.details || []).map(d => `<li>${d}</li>`).join('')}
+        </ul>
+      </div>
+    `).join('');
+  }
+
+  // Save new note to localStorage
+  function addPatchNote() {
+    const title = document.getElementById('patch-title').value.trim();
+    const author = document.getElementById('patch-author').value.trim() || 'Team Member';
+    const content = document.getElementById('patch-content').value.trim();
+
+    if (!title || !content) {
+      alert('Please fill out both the Patch Title and Details!');
+      return;
     }
 
-    // Initialize Page
-    document.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('41658h_admin_unlocked') === 'true') {
-        document.getElementById('patch-editor').style.display = 'block';
-        document.getElementById('auth-box').style.display = 'none';
-      }
-      
-      loadPatches();
+    const details = content.split('\n').filter(line => line.trim() !== '');
+    const newPatch = {
+      id: Date.now().toString(),
+      title,
+      author,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      details
+    };
 
-      document.getElementById('hamburger').addEventListener('click', () => {
-        document.getElementById('nav-links').classList.toggle('active');
-      });
+    // Save to local storage list
+    const savedLocal = localStorage.getItem('41658h_local_patches');
+    const localPatches = savedLocal ? JSON.parse(savedLocal) : [];
+    localPatches.unshift(newPatch);
+
+    localStorage.setItem('41658h_local_patches', JSON.stringify(localPatches));
+
+    // Clear Form & Re-render
+    document.getElementById('patch-title').value = '';
+    document.getElementById('patch-author').value = '';
+    document.getElementById('patch-content').value = '';
+
+    renderPatches();
+  }
+
+  // Delete local patch
+  function deleteLocalPatch(id) {
+    if (confirm('Delete this local patch entry?')) {
+      const savedLocal = localStorage.getItem('41658h_local_patches');
+      let localPatches = savedLocal ? JSON.parse(savedLocal) : [];
+      localPatches = localPatches.filter(p => p.id !== id);
+      localStorage.setItem('41658h_local_patches', JSON.stringify(localPatches));
+      renderPatches();
+    }
+  }
+
+  // Initialize Page
+  document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('41658h_admin_unlocked') === 'true') {
+      document.getElementById('patch-editor').style.display = 'block';
+      document.getElementById('auth-box').style.display = 'none';
+    }
+
+    renderPatches();
+
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('active');
     });
-  </script>
+  });
+</script>
 </body>
 </html>
