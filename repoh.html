@@ -322,68 +322,41 @@
     <p>&copy; 2026 VEX Team 41658H // Developer Portal</p>
   </footer>
 
-  <script>
-    // Initial sample patches if empty
-    const defaultPatches = [
-      {
-        id: '1',
-        title: 'v2.4 - Autonomous PID Turning Overhaul',
-        author: 'Programming Lead',
-        date: 'Oct 14, 2026',
-        details: [
-          'Tuned turn PID constants for precise 90° and 180° rotations.',
-          'Added distance sensor feedback to auto-correct wall alignment.'
-        ]
-      },
-      {
-        id: '2',
-        title: 'v2.3 - High-Roller Intake Gear ratio Change',
-        author: 'Build Lead',
-        date: 'Oct 12, 2026',
-        details: [
-          'Changed drive gears to 36T to decrease roller jamming under load.',
-          'Reinforced intake polycarbonate guide rails.'
-        ]
-      }
-    ];
-
-    // Load Patches from LocalStorage
-    function getPatches() {
-      const saved = localStorage.getItem('41658h_patch_notes');
-      if (!saved) {
-        localStorage.setItem('41658h_patch_notes', JSON.stringify(defaultPatches));
-        return defaultPatches;
-      }
-      return JSON.parse(saved);
-    }
-
-    // Render Patches to HTML
-    function renderPatches() {
-      const patches = getPatches();
+ <script>
+    // Fetch live patch notes from GitHub repository
+    async function loadPatches() {
       const container = document.getElementById('patch-list');
       const countLabel = document.getElementById('patch-count');
-      const isUnlocked = localStorage.getItem('41658h_admin_unlocked') === 'true';
 
-      countLabel.textContent = `${patches.length} Patches Logged`;
+      try {
+        // Fetch patches.json from the repository
+        const response = await fetch('patches.json');
+        if (!response.ok) throw new Error('Could not load patches.json');
+        const patches = await response.json();
 
-      if (patches.length === 0) {
-        container.innerHTML = `<p style="color: var(--text-muted); font-family: 'Fira Code';">No patch notes posted yet.</p>`;
-        return;
+        countLabel.textContent = `${patches.length} Patches Logged`;
+
+        if (patches.length === 0) {
+          container.innerHTML = `<p style="color: var(--text-muted); font-family: 'Fira Code';">No patch notes posted yet.</p>`;
+          return;
+        }
+
+        container.innerHTML = patches.map(p => `
+          <div class="patch-item">
+            <h4>${p.title}</h4>
+            <div class="patch-meta">Posted by <strong>${p.author}</strong> on ${p.date}</div>
+            <ul style="margin-left: 1.2rem; color: var(--text-main); font-size: 0.95rem;">
+              ${p.details.map(d => `<li>${d}</li>`).join('')}
+            </ul>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        container.innerHTML = `<p style="color: #ff6666; font-family: 'Fira Code';">[!] Unable to load patches.json file from repository.</p>`;
       }
-
-      container.innerHTML = patches.map(p => `
-        <div class="patch-item">
-          ${isUnlocked ? `<button class="delete-btn" onclick="deletePatch('${p.id}')">Delete</button>` : ''}
-          <h4>${p.title}</h4>
-          <div class="patch-meta">Posted by <strong>${p.author}</strong> on ${p.date}</div>
-          <ul style="margin-left: 1.2rem; color: var(--text-main); font-size: 0.95rem;">
-            ${p.details.map(d => `<li>${d}</li>`).join('')}
-          </ul>
-        </div>
-      `).join('');
     }
 
-    // Unlock Admin Mode with Code 41658
+    // Unlock Admin Portal
     function unlockRepo() {
       const code = document.getElementById('passcode-input').value;
       const error = document.getElementById('auth-error');
@@ -393,7 +366,6 @@
         document.getElementById('patch-editor').style.display = 'block';
         document.getElementById('auth-box').style.display = 'none';
         error.style.display = 'none';
-        renderPatches();
       } else {
         error.style.display = 'block';
       }
@@ -405,60 +377,17 @@
       document.getElementById('patch-editor').style.display = 'none';
       document.getElementById('auth-box').style.display = 'block';
       document.getElementById('passcode-input').value = '';
-      renderPatches();
     }
 
-    // Add New Patch Note
-    function addPatchNote() {
-      const title = document.getElementById('patch-title').value.trim();
-      const author = document.getElementById('patch-author').value.trim() || 'Team Member';
-      const content = document.getElementById('patch-content').value.trim();
-
-      if (!title || !content) {
-        alert('Please fill out both the Patch Title and Details!');
-        return;
-      }
-
-      const details = content.split('\n').filter(line => line.trim() !== '');
-      const newPatch = {
-        id: Date.now().toString(),
-        title,
-        author,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        details
-      };
-
-      const current = getPatches();
-      current.unshift(newPatch);
-      localStorage.setItem('41658h_patch_notes', JSON.stringify(current));
-
-      // Clear Form & Re-render
-      document.getElementById('patch-title').value = '';
-      document.getElementById('patch-author').value = '';
-      document.getElementById('patch-content').value = '';
-
-      renderPatches();
-    }
-
-    // Delete Patch Note
-    function deletePatch(id) {
-      if (confirm('Delete this patch note entry?')) {
-        let current = getPatches();
-        current = current.filter(p => p.id !== id);
-        localStorage.setItem('41658h_patch_notes', JSON.stringify(current));
-        renderPatches();
-      }
-    }
-
-    // On Initial Load
+    // Initialize Page
     document.addEventListener('DOMContentLoaded', () => {
       if (localStorage.getItem('41658h_admin_unlocked') === 'true') {
         document.getElementById('patch-editor').style.display = 'block';
         document.getElementById('auth-box').style.display = 'none';
       }
-      renderPatches();
+      
+      loadPatches();
 
-      // Mobile Menu Toggle
       document.getElementById('hamburger').addEventListener('click', () => {
         document.getElementById('nav-links').classList.toggle('active');
       });
