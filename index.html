@@ -1,22 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>HTML Only Text Example</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VEX V5 Team 41658H | Official Website</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <h1>Main Title of the Document</h1>
-    
-    <p>This is a standard paragraph of text. It uses the paragraph tag to separate thoughts and build simple blocks of information on a web page.</p>
+  <!-- Navigation -->
+  <header>
+    <nav class="navbar">
+      <div class="logo">41658H <span>ROBOTICS</span></div>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#robot">The Robot</a></li>
+        <li><a href="#strategy">Strategy</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#sponsors">Sponsors</a></li>
+      </ul>
+      <div class="hamburger" id="hamburger">&#9776;</div>
+    </nav>
+  </header>
 
-    <h2>Subheading for a New Topic</h2>
-    
-    <p>You can format individual words inside a paragraph. For example, you can make text <strong>bold</strong> to emphasize a point, or you can use <em>italics</em> to add a distinct creative tone to a specific phrase.</p>
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <span class="badge">VEX V5 Robotics Competition</span>
+      <h1>TEAM 41658H</h1>
+      <p>Engineering innovation, dynamic strategy, and competitive excellence.</p>
+      <div class="hero-btns">
+        <a href="#robot" class="btn primary-btn">Explore Our Robot</a>
+        <a href="#strategy" class="btn secondary-btn">Season Strategy</a>
+      </div>
+    </div>
+  </section>
 
-    <h2>A Final Note</h2>
-    
-    <p>Because this code uses raw HTML with no styles attached, the web browser will display everything using its default fonts and standard black-and-white layouts.</p>
+  <!-- The Robot Section -->
+  <section id="robot" class="section">
+    <div class="container">
+      <h2>The Robot</h2>
+      <div class="grid-2">
+        <div class="robot-image">
+          <img src="assets/robot.jpg" alt="Team 41658H VEX Robot">
+        </div>
+        <div class="robot-details">
+          <h3>Subsystem Breakdown</h3>
+          <ul class="spec-list">
+            <li><strong>Drivetrain:</strong> Custom 6-motor low-friction drivetrain engineered for high speed and maneuvering.</li>
+            <li><strong>Intake System:</strong> Dual-stage active roller intake configured for high throughput.</li>
+            <li><strong>Scoring Mechanism:</strong> Modular lift/indexer tuned for rapid game element control.</li>
+            <li><strong>Sensors:</strong> Optical Encoders, Inertial Sensor, and Distance Sensors for autonomous navigation.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- Strategy Section -->
+  <section id="strategy" class="section dark-bg">
+    <div class="container">
+      <h2>Game Strategy</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>Autonomous Routines</h3>
+          <p>Multi-path autonomous programs leveraging PID controllers and sensor feedback to consistently achieve Autonomous Win Points.</p>
+        </div>
+        <div class="card">
+          <h3>Driver Control</h3>
+          <p>Optimized driver control mapping, active anti-jamming logic, and real-time telemetry on the V5 Controller screen.</p>
+        </div>
+        <div class="card">
+          <h3>Match Execution</h3>
+          <p>Dynamic alliance coordination focusing on defensive control, field coverage, and high-value scoring maneuvers during endgame.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 VEX Team 41658H. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
