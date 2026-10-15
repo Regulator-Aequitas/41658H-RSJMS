@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Repo & Patch Notes | VEX Team 41658H</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-black: #050505;
+      --card-bg: #0d120e;
+      --green-primary: #00ff66;
+      --green-glow: rgba(0, 255, 102, 0.25);
+      --green-border: rgba(0, 255, 102, 0.3);
+      --text-main: #e0f8ea;
+      --text-muted: #80b393;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    /* Navbar Header */
+    header {
+      position: sticky;
+      top: 0;
+      background-color: rgba(5, 5, 5, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      border-bottom: 1px solid var(--green-border);
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: #fff;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .logo span {
+      color: var(--green-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active-link {
+      color: var(--green-primary);
+      text-shadow: 0 0 8px var(--green-glow);
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.5rem;
+      color: var(--green-primary);
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 4rem 2rem 2rem;
+      text-align: center;
+      background: radial-gradient(circle at center, var(--green-glow) 0%, transparent 70%);
+    }
+
+    .badge {
+      background-color: rgba(0, 255, 102, 0.1);
+      color: var(--green-primary);
+      border: 1px solid var(--green-border);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      margin: 1rem 0 0.5rem;
+      color: var(--green-primary);
+      text-shadow: 0 0 12px var(--green-glow);
+      font-family: 'Fira Code', monospace;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Layout & Cards */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--green-border);
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.7rem 1.4rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Fira Code', monospace;
+      transition: all 0.2s ease;
+    }
+
+    .primary-btn {
+      background-color: var(--green-primary);
+      color: #000;
+      border: none;
+      box-shadow: 0 0 10px var(--green-glow);
+    }
+
+    .primary-btn:hover {
+      background-color: #33ff85;
+      box-shadow: 0 0 18px var(--green-glow);
+    }
+
+    .secondary-btn {
+      background-color: transparent;
+      border: 1px solid var(--green-border);
+      color: var(--green-primary);
+    }
+
+    .secondary-btn:hover {
+      background-color: rgba(0, 255, 102, 0.1);
+    }
+
+    /* Inputs */
+    input, textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--green-border);
+      background-color: #050806;
+      color: var(--green-primary);
+      font-family: 'Fira Code', monospace;
+      margin-bottom: 1rem;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--green-primary);
+      box-shadow: 0 0 8px var(--green-glow);
+    }
+
+    /* Patch Note Item */
+    .patch-item {
+      border-left: 3px solid var(--green-primary);
+      padding-left: 1.2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.2rem;
+      border-bottom: 1px dashed rgba(0, 255, 102, 0.15);
+      position: relative;
+    }
+
+    .patch-item h4 {
+      color: var(--green-primary);
+      font-size: 1.1rem;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .patch-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .delete-btn {
+      background: rgba(255, 60, 60, 0.15);
+      color: #ff6666;
+      border: 1px solid rgba(255, 60, 60, 0.3);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    .delete-btn:hover {
+      background: rgba(255, 60, 60, 0.3);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--green-border);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      .hamburger { display: block; }
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background-color: var(--bg-black);
+        border-bottom: 1px solid var(--green-border);
+        width: 100%;
+        padding: 1.5rem;
+        text-align: center;
+      }
+      .nav-links.active { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header / Nav -->
+  <header>
+    <nav class="navbar">
+      <div class="logo">41658H <span>// REPO</span></div>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="robot.html">Robot</a></li>
+        <li><a href="strategy.html">Strategy</a></li>
+        <li><a href="team.html">Team</a></li>
+        <li><a href="notebook.html">Notebook</a></li>
+        <li><a href="repoh.html" class="active-link">Repo</a></li>
+      </ul>
+      <div class="hamburger" id="hamburger">&#9776;</div>
+    </nav>
+  </header>
+
+  <!-- Hero Header -->
+  <section class="hero">
+    <span class="badge">[ SYSTEM REPOSITORY ]</span>
+    <h1>PATCH NOTES & CHANGELOG</h1>
+    <p>Live development updates, code iterations, and engineering patch history.</p>
+  </section>
+
+  <div class="container">
+
+    <!-- Admin Authentication Box -->
+    <div id="auth-box" class="card" style="text-align: center;">
+      <h3 style="color: var(--green-primary); font-family: 'Fira Code', monospace; margin-bottom: 0.5rem;">🔒 TEAM PASSCODE REQUIRED</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.2rem;">Enter passcode 41658 to access update editor and post new patches.</p>
+      
+      <div style="max-width: 300px; margin: 0 auto;">
+        <input type="password" id="passcode-input" placeholder="Enter Access Code..." style="text-align: center;">
+        <button onclick="unlockRepo()" class="btn primary-btn" style="width: 100%;">ACCESS REPO</button>
+      </div>
+      <p id="auth-error" style="color: #ff6666; font-size: 0.85rem; margin-top: 0.8rem; display: none;">[!] ACCESS DENIED: Invalid Passcode</p>
+    </div>
+
+    <!-- Live Patch Notes Editor (Unlocked via 41658) -->
+    <div id="patch-editor" class="card" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="color: var(--green-primary); font-family: 'Fira Code', monospace;">⚡ POST NEW PATCH NOTE</h3>
+        <button onclick="lockRepo()" class="btn secondary-btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">LOCK PORTAL</button>
+      </div>
+
+      <input type="text" id="patch-title" placeholder="Patch Title (e.g. v2.5 - Autonomous PID Tuning)">
+      <input type="text" id="patch-author" placeholder="Author / Lead (e.g. Programming Lead)">
+      <textarea id="patch-content" rows="4" placeholder="Enter details / bullet points (one per line)..."></textarea>
+      
+      <button onclick="addPatchNote()" class="btn primary-btn">+ PUBLISH PATCH NOTE</button>
+    </div>
+
+    <!-- Live Patch Notes Feed -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--green-border); padding-bottom: 0.8rem;">
+        <h3 style="color: var(--green-primary); font-family: 'Fira Code', monospace;">📜 CHANGELOG FEED</h3>
+        <span id="patch-count" style="font-family: 'Fira Code', monospace; color: var(--text-muted); font-size: 0.85rem;">0 Patches Logged</span>
+      </div>
+
+      <div id="patch-list">
+        <!-- Dynamic Patch Notes render here -->
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>&copy; 2026 VEX Team 41658H // Developer Portal</p>
+  </footer>
+
+  <script>
+    // Initial sample patches if empty
+    const defaultPatches = [
+      {
+        id: '1',
+        title: 'v2.4 - Autonomous PID Turning Overhaul',
+        author: 'Programming Lead',
+        date: 'Oct 14, 2026',
+        details: [
+          'Tuned turn PID constants for precise 90° and 180° rotations.',
+          'Added distance sensor feedback to auto-correct wall alignment.'
+        ]
+      },
+      {
+        id: '2',
+        title: 'v2.3 - High-Roller Intake Gear ratio Change',
+        author: 'Build Lead',
+        date: 'Oct 12, 2026',
+        details: [
+          'Changed drive gears to 36T to decrease roller jamming under load.',
+          'Reinforced intake polycarbonate guide rails.'
+        ]
+      }
+    ];
+
+    // Load Patches from LocalStorage
+    function getPatches() {
+      const saved = localStorage.getItem('41658h_patch_notes');
+      if (!saved) {
+        localStorage.setItem('41658h_patch_notes', JSON.stringify(defaultPatches));
+        return defaultPatches;
+      }
+      return JSON.parse(saved);
+    }
+
+    // Render Patches to HTML
+    function renderPatches() {
+      const patches = getPatches();
+      const container = document.getElementById('patch-list');
+      const countLabel = document.getElementById('patch-count');
+      const isUnlocked = localStorage.getItem('41658h_admin_unlocked') === 'true';
+
+      countLabel.textContent = `${patches.length} Patches Logged`;
+
+      if (patches.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-muted); font-family: 'Fira Code';">No patch notes posted yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = patches.map(p => `
+        <div class="patch-item">
+          ${isUnlocked ? `<button class="delete-btn" onclick="deletePatch('${p.id}')">Delete</button>` : ''}
+          <h4>${p.title}</h4>
+          <div class="patch-meta">Posted by <strong>${p.author}</strong> on ${p.date}</div>
+          <ul style="margin-left: 1.2rem; color: var(--text-main); font-size: 0.95rem;">
+            ${p.details.map(d => `<li>${d}</li>`).join('')}
+          </ul>
+        </div>
+      `).join('');
+    }
+
+    // Unlock Admin Mode with Code 41658
+    function unlockRepo() {
+      const code = document.getElementById('passcode-input').value;
+      const error = document.getElementById('auth-error');
+
+      if (code === '41658') {
+        localStorage.setItem('41658h_admin_unlocked', 'true');
+        document.getElementById('patch-editor').style.display = 'block';
+        document.getElementById('auth-box').style.display = 'none';
+        error.style.display = 'none';
+        renderPatches();
+      } else {
+        error.style.display = 'block';
+      }
+    }
+
+    // Lock Portal
+    function lockRepo() {
+      localStorage.removeItem('41658h_admin_unlocked');
+      document.getElementById('patch-editor').style.display = 'none';
+      document.getElementById('auth-box').style.display = 'block';
+      document.getElementById('passcode-input').value = '';
+      renderPatches();
+    }
+
+    // Add New Patch Note
+    function addPatchNote() {
+      const title = document.getElementById('patch-title').value.trim();
+      const author = document.getElementById('patch-author').value.trim() || 'Team Member';
+      const content = document.getElementById('patch-content').value.trim();
+
+      if (!title || !content) {
+        alert('Please fill out both the Patch Title and Details!');
+        return;
+      }
+
+      const details = content.split('\n').filter(line => line.trim() !== '');
+      const newPatch = {
+        id: Date.now().toString(),
+        title,
+        author,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        details
+      };
+
+      const current = getPatches();
+      current.unshift(newPatch);
+      localStorage.setItem('41658h_patch_notes', JSON.stringify(current));
+
+      // Clear Form & Re-render
+      document.getElementById('patch-title').value = '';
+      document.getElementById('patch-author').value = '';
+      document.getElementById('patch-content').value = '';
+
+      renderPatches();
+    }
+
+    // Delete Patch Note
+    function deletePatch(id) {
+      if (confirm('Delete this patch note entry?')) {
+        let current = getPatches();
+        current = current.filter(p => p.id !== id);
+        localStorage.setItem('41658h_patch_notes', JSON.stringify(current));
+        renderPatches();
+      }
+    }
+
+    // On Initial Load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('41658h_admin_unlocked') === 'true') {
+        document.getElementById('patch-editor').style.display = 'block';
+        document.getElementById('auth-box').style.display = 'none';
+      }
+      renderPatches();
+
+      // Mobile Menu Toggle
+      document.getElementById('hamburger').addEventListener('click', () => {
+        document.getElementById('nav-links').classList.toggle('active');
+      });
+    });
+  </script>
+</body>
+</html>
